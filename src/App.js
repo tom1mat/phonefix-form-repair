@@ -1,5 +1,53 @@
+// <?php
+// /**
+//  * The Header for our theme
+//  *
+//  * Displays all of the <head> section and everything up till <div id="main">
+//  *
+//  * @package WordPress
+//  * @subpackage Templatemela
+//  */
+//  $query = "SELECT wps4_posts.ID, wps4_postmeta.meta_key, wps4_postmeta.meta_value FROM wps4_postmeta INNER JOIN wps4_posts ON wps4_posts.ID = wps4_postmeta.post_id WHERE wps4_postmeta.meta_key = 'reparacion' OR wps4_postmeta.meta_key = 'precio' or wps4_postmeta.meta_key = 'imagen' or wps4_postmeta.meta_key = 'modelo'";
+//  $res = $wpdb->get_results($query);
+
+
+//  $items = [];
+//  $modelos = [];
+//  $reparaciones = [];
+//  $relaciones = [];
+
+//  foreach ($res as $each) {
+//      $items[$each->ID][$each->meta_key] = $each->meta_key == 'imagen' ? wp_get_attachment_image_src($each->meta_value, 'full') : $each->meta_value;
+
+//      if ($each->meta_key == 'modelo') {
+//         if (!in_array ($each->meta_value, $modelos)) $modelos[] = $each->meta_value;
+//      }
+
+//      if ($each->meta_key == 'reparacion') {
+//         if (!in_array ($each->meta_value, $reparaciones)) $reparaciones[] = $each->meta_value;
+//      }
+//  }
+
+//  foreach ($items as $each) {
+//      $relaciones[$each['modelo']][$each['reparacion']] = $each;
+//  }
+
+//  $modRelsStringified = json_encode($relaciones);
+//  $modelosStringified = json_encode($modelos);
+//  $reparacionesStringified = json_encode($reparaciones);
+// ?>
+//     <!DOCTYPE html>
+// <html <?php language_attributes(); ?>>
+//     <head>
+//         <script>
+//             var presup_relaciones = JSON.parse('<?php echo $modRelsStringified; ?>');
+//             var presup_modelos = JSON.parse('<?php echo $modelosStringified; ?>');
+//             var presup_reparaciones = JSON.parse('<?php echo $reparacionesStringified; ?>');
+//             console.log(presup_relaciones);
+//             console.log(presup_modelos);
+//             console.log(presup_reparaciones);
+//         </script>
 import React from 'react';
-import './App.css';
 
 import { Form, notification, Input, Button, Checkbox, Select, Row, Col } from 'antd';
 
@@ -7,47 +55,44 @@ const { Option } = Select;
 
 // models: ["5 / 5S / 5C", "SE", "6", "6 PLUS", "6S", "6S PLUS", "7", "7 PLUS", "8", "8 PLUS", "X", "XS", "XS MAX", "XR"],
 // repairs: ["Pantalla", "Batería", "Conector de carga", "Señal celular", "Señal WiFi", "Cámara frontal", "Cámara principal", "Micrófono", "Altavoz"],
-const formStyles = {
-  padding: '10%',
-  background: 'whitesmoke',
-}
 class FixForm extends React.Component {
   constructor(props) {
     super(props);
 
-    const relaciones = {
-      X: {
-        Pantalla: {
-          imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
-          precio: 1500,
-        },
-        Batería: {
-          imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
-          precio: 1500,
-        },
-        Micrófono: {
-          imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
-          precio: 1500,
-        }
-      },
-      5: {
-        Pantalla: {
-          imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
-          precio: 1500,
-        },
-        Batería: {
-          imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
-          precio: 1500,
-        },
-        Micrófono: {
-          imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
-          precio: 1500,
-        }
-      }
-    }
+    // const relaciones = {
+    //   X: {
+    //     Pantalla: {
+    //       imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
+    //       precio: 1500,
+    //     },
+    //     Batería: {
+    //       imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
+    //       precio: 1500,
+    //     },
+    //     Micrófono: {
+    //       imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
+    //       precio: 1500,
+    //     }
+    //   },
+    //   5: {
+    //     Pantalla: {
+    //       imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
+    //       precio: 1500,
+    //     },
+    //     Batería: {
+    //       imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
+    //       precio: 1500,
+    //     },
+    //     Micrófono: {
+    //       imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
+    //       precio: 1500,
+    //     }
+    //   }
+    // }
 
-    const reparaciones = ['Pantalla', 'Batería', 'Micrófono'];
-    const modelos = ['5', 'X'];
+    const { modelos, reparaciones, relaciones } = window;
+
+    console.log(modelos, reparaciones, relaciones);
 
     this.state = {
       modelos,
@@ -79,6 +124,9 @@ class FixForm extends React.Component {
     if (reparacion) {
       const selectedModel = this.state.relaciones[modelo][reparacion];
       this.setState({ selectedModel });
+
+      console.log(modelo, ' ', reparacion);
+      console.log(this.state.relaciones);
     }
   }
 
@@ -96,7 +144,7 @@ class FixForm extends React.Component {
     const { getFieldDecorator } = this.props.form;
     const { modelos, reparaciones, selectedModel } = this.state;
     return (
-      <Form onSubmit={this.handleSubmit} className="login-form" style={formStyles}>
+      <Form onSubmit={this.handleSubmit} className="form-reparaciones">
         <Row gutter={24}>
           <Col span={12}>
             <Form.Item>
@@ -167,7 +215,7 @@ class FixForm extends React.Component {
             </Form.Item>
           </Col>
         </Row>
-        {selectedModel && <img src={selectedModel.imagen} alt="Modelo"/>}
+        {selectedModel && <img src={selectedModel.imagen[0]} alt="Modelo" />}
       </Form>
     );
   }
