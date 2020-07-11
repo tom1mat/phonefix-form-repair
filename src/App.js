@@ -53,46 +53,53 @@ import { Form, notification, Input, Button, Checkbox, Select, Row, Col } from 'a
 
 const { Option } = Select;
 
-// models: ["5 / 5S / 5C", "SE", "6", "6 PLUS", "6S", "6S PLUS", "7", "7 PLUS", "8", "8 PLUS", "X", "XS", "XS MAX", "XR"],
-// repairs: ["Pantalla", "Batería", "Conector de carga", "Señal celular", "Señal WiFi", "Cámara frontal", "Cámara principal", "Micrófono", "Altavoz"],
 class FixForm extends React.Component {
   constructor(props) {
     super(props);
 
+    // const modelos = ["5", "X"];
+    // const reparaciones = ["Micrófono", "Pantalla", "Batería"];
+    // const exampleImage = ["https://previews.123rf.com/images/roywylam/roywylam1511/roywylam151100002/47935765-tel%C3%A9fono-celular-m%C3%B3vil-elegante-3d-que-pone-completamente.jpg", 1200, 1200, false];    
+    // const exampleImage2 = ["https://m.eltiempo.com/files/image_640_428/uploads/2017/11/24/5a18df6fd8628.jpeg", 1200, 1200, false];    
     // const relaciones = {
     //   X: {
     //     Pantalla: {
-    //       imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
+    //       imagen: exampleImage,
+    //       modelo: 'X',
     //       precio: 1500,
+    //       reparacion: 'Pantalla',
     //     },
     //     Batería: {
-    //       imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
+    //       imagen: exampleImage,
+    //       modelo: 'X',
     //       precio: 1500,
+    //       reparacion: 'Batería',
     //     },
     //     Micrófono: {
-    //       imagen: 'https://images-na.ssl-images-amazon.com/images/I/41YGS1ufu6L._AC_SY400_.jpg',
+    //       imagen: exampleImage,
+    //       modelo: 'X',
     //       precio: 1500,
+    //       reparacion: 'Micrófono',
     //     }
     //   },
     //   5: {
     //     Pantalla: {
-    //       imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
+    //       imagen: exampleImage2,
     //       precio: 1500,
+    //       modelo: '5',
+    //       reparacion: 'Pantalla',
     //     },
     //     Batería: {
-    //       imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
+    //       imagen: exampleImage2,
     //       precio: 1500,
+    //       modelo: '5',
+    //       reparacion: 'Batería',
     //     },
-    //     Micrófono: {
-    //       imagen: 'https://cdn.computerhoy.com/sites/navi.axelspringer.es/public/styles/main_card_image/https/bdt.computerhoy.com/sites/default/files/Apple_iphone-5.png?itok=44Zn1pEd',
-    //       precio: 1500,
-    //     }
     //   }
     // }
 
     const { modelos, reparaciones, relaciones } = window;
 
-    console.log(modelos, reparaciones, relaciones);
 
     this.state = {
       modelos,
@@ -104,15 +111,67 @@ class FixForm extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        const item = this.state.relaciones[values.modelo][values.modelo];
+        const item = this.state.relaciones[values.modelo][values.reparacion];
 
-        notification.success({
-          message: 'Se ha enviado la información',
-          description: 'Lo contactaremos a la brevedad',
-          placement: 'bottomRight'
-        });
+        const { direccion, email, telefono, remember } = values;
+
+        const { modelo, reparacion, precio } = item;
+
+        const data = new FormData();
+        data.append('MODELO', modelo);
+        data.append('REPARACION', reparacion);
+        data.append('PRECIO', precio);
+        data.append('DIRECCION', direccion);
+        data.append('EMAIL', email);
+        data.append('TELEFONO', telefono);
+        data.append('PUERTA A PUERTA', remember ? 'Si' : 'No');
+
+        const params = {
+          method: 'POST',
+          body: data,
+        };
+
+        try {
+          // const url = 'http://localhost/mail-presupuestador.php';
+          const url = '/mail-presupuestador.php';
+
+          const response = await fetch(url, params);
+
+          if (response.status === 200) {
+            const { status } = await response.json();
+
+            if (status === 'success') {
+              notification.success({
+                message: 'Se ha enviado la información',
+                description: 'Lo contactaremos a la brevedad',
+                placement: 'bottomRight'
+              });
+            } else {
+              console.log('error 1');
+              notification.error({
+                message: 'No se pudo enviar el mensaje',
+                description: 'Intente en otro momento por favor',
+                placement: 'bottomRight'
+              });
+            }
+          } else {
+            console.log('error 2');
+            notification.error({
+              message: 'No se pudo enviar el mensaje',
+              description: 'Intente en otro momento por favor',
+              placement: 'bottomRight'
+            });
+          } 
+        } catch (error) {
+          console.log('error 3');
+          notification.error({
+            message: 'No se pudo enviar el mensaje',
+            description: 'Intente en otro momento por favor',
+            placement: 'bottomRight'
+          });
+        }
       }
     });
   };
@@ -122,11 +181,11 @@ class FixForm extends React.Component {
     const reparacion = this.props.form.getFieldValue('reparacion');
 
     if (reparacion) {
-      const selectedModel = this.state.relaciones[modelo][reparacion];
-      this.setState({ selectedModel });
+      const reparacionesDisponibles = this.state.relaciones[modelo];
+      const selectedModel = reparacionesDisponibles[reparacion];
 
-      console.log(modelo, ' ', reparacion);
-      console.log(this.state.relaciones);
+      this.setState({ reparaciones: Object.keys(reparacionesDisponibles) })
+      this.setState({ selectedModel });
     }
   }
 
@@ -206,7 +265,7 @@ class FixForm extends React.Component {
               {getFieldDecorator('remember', {
                 valuePropName: 'checked',
                 initialValue: true,
-              })(<Checkbox>Puerta a puerta</Checkbox>)}
+              })(<Checkbox className="puerta-puerta">Puerta a puerta</Checkbox>)}
             </Form.Item>
           </Col>
           <Col span={12}>
