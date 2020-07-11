@@ -49,7 +49,7 @@
 //         </script>
 import React from 'react';
 
-import { Form, notification, Input, Button, Checkbox, Select, Row, Col } from 'antd';
+import { Form, notification, Input, Button, Checkbox, Select, Row, Col, Badge } from 'antd';
 
 const { Option } = Select;
 
@@ -59,8 +59,8 @@ class FixForm extends React.Component {
 
     // const modelos = ["5", "X"];
     // const reparaciones = ["Micrófono", "Pantalla", "Batería"];
-    // const exampleImage = ["https://previews.123rf.com/images/roywylam/roywylam1511/roywylam151100002/47935765-tel%C3%A9fono-celular-m%C3%B3vil-elegante-3d-que-pone-completamente.jpg", 1200, 1200, false];    
-    // const exampleImage2 = ["https://m.eltiempo.com/files/image_640_428/uploads/2017/11/24/5a18df6fd8628.jpeg", 1200, 1200, false];    
+    // const exampleImage = ["https://previews.123rf.com/images/roywylam/roywylam1511/roywylam151100002/47935765-tel%C3%A9fono-celular-m%C3%B3vil-elegante-3d-que-pone-completamente.jpg", 1200, 1200, false];
+    // const exampleImage2 = ["https://m.eltiempo.com/files/image_640_428/uploads/2017/11/24/5a18df6fd8628.jpeg", 1200, 1200, false];
     // const relaciones = {
     //   X: {
     //     Pantalla: {
@@ -106,6 +106,7 @@ class FixForm extends React.Component {
       reparaciones,
       relaciones,
       selectedModel: null,
+      isDisabled: false,
     }
   }
 
@@ -113,6 +114,7 @@ class FixForm extends React.Component {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
+        this.setState({ isDisabled: true });
         const item = this.state.relaciones[values.modelo][values.reparacion];
 
         const { direccion, email, telefono, remember } = values;
@@ -163,8 +165,10 @@ class FixForm extends React.Component {
               description: 'Intente en otro momento por favor',
               placement: 'bottomRight'
             });
-          } 
+          }
+          this.setState({ isDisabled: false });
         } catch (error) {
+          this.setState({ isDisabled: false });
           console.log('error 3');
           notification.error({
             message: 'No se pudo enviar el mensaje',
@@ -184,6 +188,7 @@ class FixForm extends React.Component {
       const reparacionesDisponibles = this.state.relaciones[modelo];
       const selectedModel = reparacionesDisponibles[reparacion];
 
+      this.props.form.setFieldsValue({ reparacion: null });
       this.setState({ reparaciones: Object.keys(reparacionesDisponibles) })
       this.setState({ selectedModel });
     }
@@ -205,7 +210,7 @@ class FixForm extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit} className="form-reparaciones">
         <Row gutter={24}>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Form.Item>
               {getFieldDecorator('modelo', {
                 rules: [{ required: true, message: 'Por favor seleccione un modelo' }],
@@ -214,7 +219,7 @@ class FixForm extends React.Component {
               </Select>)}
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Form.Item>
               {getFieldDecorator('reparacion', {
                 rules: [{ required: true, message: 'Por favor seleccione una reparación' }],
@@ -225,14 +230,14 @@ class FixForm extends React.Component {
           </Col>
         </Row>
         <Row gutter={24}>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Form.Item>
               {getFieldDecorator('direccion', {
                 rules: [{ message: 'Por favor ingrese la dirección' }],
               })(<Input size="large" placeholder="Dirección" />)}
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Form.Item>
               {getFieldDecorator('telefono', {
                 rules: [{ message: 'Por favor ingrese un teléfono' }],
@@ -241,7 +246,7 @@ class FixForm extends React.Component {
           </Col>
         </Row>
         <Row gutter={24}>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Form.Item>
               {getFieldDecorator('email', {
                 rules: [
@@ -251,7 +256,7 @@ class FixForm extends React.Component {
               })(<Input size="large" placeholder="Email" />)}
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Form.Item>
               {getFieldDecorator('nombre', {
                 rules: [{ message: 'Por favor ingrese su nombre' }],
@@ -260,7 +265,7 @@ class FixForm extends React.Component {
           </Col>
         </Row>
         <Row gutter={24}>
-          <Col span={12}>
+          <Col xs={24} md={24}>
             <Form.Item>
               {getFieldDecorator('remember', {
                 valuePropName: 'checked',
@@ -268,13 +273,24 @@ class FixForm extends React.Component {
               })(<Checkbox className="puerta-puerta">Puerta a puerta</Checkbox>)}
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item>
-              <Button size="large" htmlType="submit">Solicitar reparación</Button>
-            </Form.Item>
-          </Col>
         </Row>
-        {selectedModel && <img src={selectedModel.imagen[0]} alt="Modelo" />}
+        {selectedModel && (
+          <Row gutter={24}>
+            <Col xs={24} md={12}>
+              <Form.Item>
+                <Button disabled={this.state.isDisabled} size="large" htmlType="submit">Solicitar reparación</Button>
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12} className="col-precio">
+              <div className="precio">
+                Costo de la reparación: <Badge className="precio-badge" count={'$'+selectedModel.precio} />
+              </div>
+            </Col>
+            <Col xs={24} md={24}>
+              <img className="imagen-modelo" src={selectedModel.imagen[0]} alt="Modelo" />
+            </Col>
+          </Row>
+        )}
       </Form>
     );
   }
